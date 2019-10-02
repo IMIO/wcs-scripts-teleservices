@@ -25,7 +25,7 @@ pipeline {
             }
             steps {
                 withCredentials([usernameColonPassword(credentialsId: 'nexus-teleservices', variable: 'CREDENTIALS'),string(credentialsId: 'nexus-url-stretch', variable:'NEXUS_URL_STRETCH')]) {
-                    sh ('curl -v --fail -u $CREDENTIALS -X POST -H Content-Type:multipart/form-data --data-binary @scripts-teleservices_`echo ${VERSION}`_amd64.deb $NEXUS_URL_STRETCH')
+                    sh ('curl -v --fail -u $CREDENTIALS -X POST -H Content-Type:multipart/form-data --data-binary @wcs-scripts-teleservices_`echo ${VERSION}`_amd64.deb $NEXUS_URL_STRETCH')
                 }
             }
         }
