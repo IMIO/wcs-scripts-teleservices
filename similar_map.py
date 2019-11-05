@@ -14,7 +14,7 @@ if os.path.dirname(__file__) not in sys.path:
 import json
 import time
 
-from qommon.form import MapWidget
+from wcs.qommon.form import MapWidget
 
 import close_demands
 
