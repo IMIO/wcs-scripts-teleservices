@@ -29,6 +29,7 @@ class Town(object):
         self.strong_authentication = (
             variables.get("session_user_var_verified_fields") or None
         )
+        self.strong_authenticated_fields = [] if variables.get('session_user') is None else getattr(variables.get('session_user'),"verified_fields",[])
         self.form_objects = variables.get("form_objects")
         try:
             self.form_slug = variables.get("form_slug")
@@ -43,6 +44,12 @@ class Town(object):
 
     def dt_to_date(self, dt, format_date="%Y-%m-%d", format_time="%H:%M:%S"):
         return datetime.strptime(dt, "{0} {1}".format(format_date, format_time)).date()
+
+    def is_strong_authentication(self, *args):
+        if "_niss" in self.strong_authenticated_fields:
+            return "True"
+        else:
+            return "False"
 
     # Méthode qui sert à retourner un texte accompaggé d'un résultat.
     # valeur : Un nombre
