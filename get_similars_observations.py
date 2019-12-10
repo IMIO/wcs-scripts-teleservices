@@ -83,7 +83,7 @@ def set_data_on_first_observation(data, signalement_similaire):
                             lst_signalements = str(formdata.data[field.id] or '').split(',')
                             if str(guess_form_number) not in lst_signalements:
                                 formdata.data[field.id] = "{},{}".format(formdata.data[field.id] or '', guess_form_number)
-                            cpt_signalements = len(lst_signalements) 
+                            cpt_signalements = len(lst_signalements) + 1
                     if 'cpt_signalements' == field.varname:
                         formdata.data[field.id] = str(cpt_signalements)
                 formdata.store()
