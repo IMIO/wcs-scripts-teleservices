@@ -69,7 +69,7 @@ def set_data_on_first_observation(data, signalement_similaire):
         if str(formdata.id) == str(signalement_similaire):
             for field in formdef.get_all_fields():
                 if field.varname is not None:
-                    if 'str_all_mails' == field.varname and data.get('form_var_mail_for_similar_observation','') != '':
+                    if 'str_all_mails' == field.varname and data.get('form_var_mail_for_similar_observation') is not None:
                         if field.id not in formdata.data.keys() or formdata.data[field.id] is None:
                             formdata.data[field.id] = form_var_mail_for_similar_observation
                         else:
