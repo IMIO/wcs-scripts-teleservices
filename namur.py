@@ -83,7 +83,7 @@ class Namur(town.Town):
     # before_2020 : Pour la gestion des actes avant 2020 ou apres 2020
     # integration des nouvelles reglementations de la BAEC.
     def compute_standard_motivations_table(self, motif_tab_var, lst_motifs_disponibles_var, before_2020="True"):
-        if globals().get("form_slug") == "acte-de-reconnaissance-d-enfant":
+        if "acte-de-reconnaissance-d-enfant" in globals().get("form_slug"):
             result = self.total_with_tab_tiers("form_var_nb_exemplaire", "form_option_cost", "form_var_tableau_tiers")
         else:
             nb_tiers = len(globals().get('form_var_tableau_tiers')) if globals().get('form_var_tableau_tiers') is not None else 1
@@ -173,17 +173,23 @@ class Namur(town.Town):
         str_table = "{}{}".format(str_table, "</table>")
         return str_table
 
-
+    # args : form_var_nb_exemplaire, form_option_cost, form_var_tableau_tiers
+    # form : acte reconnaissance enfant.
     def total_with_tab_tiers(self, *args):
         nb_tiers = 0
         result = ""
+        # commande pour un tiers
         if globals().get(args[2]) is not None:
             for tiers in globals().get(args[2]):
-                if tiers[4].strip() in self.VALID_CP:
+                if tiers[4].strip() not in self.VALID_CP:
                     nb_tiers = nb_tiers + 1
             result = str(int(globals().get(args[0]) or '1') * Decimal(globals().get(args[1]) or '1')* nb_tiers)
+        # commande pour sois-meme
         else:
-            result = str(int(globals().get(args[0]) or '1') * Decimal(globals().get(args[1]) or '1'))
+            if (globals().get("form_var_cp_demandeur") or '').strip() not in self.VALID_CP:
+                result = str(int(globals().get(args[0]) or '1') * Decimal(globals().get(args[1]) or '1'))
+            else:
+                result = '0.00'
         return result
         # return str(int(globals().get(args[0]) or '1') * Decimal(globals().get(args[1]) or '1')* (len(globals().get(args[2]) or '/')))
 
