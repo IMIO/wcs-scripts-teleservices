@@ -14,6 +14,7 @@ import town
 
 class Namur(town.Town):
     def __init__(self):
+        self.VALID_CP = ["5000", "5001", "5002", "5003", "5004", "5020", "5021", "5022", "5024", "5100", "5101"]
         super(Namur, self).__init__(variables=globals())
 
     # Get a readable list formated like : [('id1','libelle1','price1'),('id2','libelle2','price2')]
@@ -74,31 +75,38 @@ class Namur(town.Town):
 
     def compute_standard_motivations_table_args(self, *args):
         values = args
-        retour = ""
-        if (
-            globals().get(values[0]) is not None
-            and globals().get(values[1]) is not None
-        ):
-            retour = str(
-                self.compute_standard_motivations_table(
-                    globals().get(values[0]), globals().get(values[1])
-                )
-            )
+        retour = ''
+        if globals().get(values[0]) is not None and globals().get(values[1]) is not None:
+            retour = str(self.compute_standard_motivations_table(globals().get(values[0]), globals().get(values[1]), globals().get("form_option_before2020")))
         return retour
 
-    def compute_standard_motivations_table(
-        self, motif_tab_var, lst_motifs_disponibles_var
-    ):
-        nb_tiers = (
-            len(globals().get("form_var_tableau_tiers"))
-            if globals().get("form_var_tableau_tiers") is not None
-            else 1
-        )
-        return nb_tiers * Decimal(
-            super(Namur, self).compute_standard_motivations_table(
-                motif_tab_var, lst_motifs_disponibles_var
-            )
-        )
+    # before_2020 : Pour la gestion des actes avant 2020 ou apres 2020
+    # integration des nouvelles reglementations de la BAEC.
+    def compute_standard_motivations_table(self, motif_tab_var, lst_motifs_disponibles_var, before_2020="True"):
+        if globals().get("form_slug") == "acte-de-reconnaissance-d-enfant":
+            result = self.total_with_tab_tiers("form_var_nb_exemplaire", "form_option_cost", "form_var_tableau_tiers")
+        else:
+            nb_tiers = len(globals().get('form_var_tableau_tiers')) if globals().get('form_var_tableau_tiers') is not None else 1
+            result = Decimal("0")
+            if str(before_2020) == "True" or before_2020 is None:
+                result = nb_tiers * Decimal(super(Namur, self).compute_standard_motivations_table(motif_tab_var, lst_motifs_disponibles_var))
+            else:
+                nb_doc = 1 if motif_tab_var is None else sum([0 if e[1] is None or e[1] == "" else int(e[1]) for e in motif_tab_var])
+                if globals().get("form_var_tableau_tiers") is not None:
+                    for tiers in globals().get("form_var_tableau_tiers"):
+                        if "acte-de-divorce" in globals().get("form_slug"):
+                            code_postal_tiers = tiers[7]
+                        elif "acte-de-mariage" in globals().get("form_slug"):
+                            code_postal_tiers = tiers[6]
+                        else:
+                            code_postal_tiers = tiers[4]
+                        if code_postal_tiers.strip() not in self.VALID_CP:
+                            result = result + Decimal(globals().get("form_option_cost"))
+                    result = nb_doc * result
+                else:
+                    if globals().get("form_var_cp_demandeur").strip() not in self.VALID_CP:
+                        result = nb_doc * Decimal(globals().get("form_option_cost"))
+        return result
 
     # global_cost != 0 seulement si on n'utilise pas les motifs (motif_tab_var is None and lst_motifs_disponibles_var is None)
     # global_nb_exemplaire != 0 seulement si on n'utilise pas les motifs (motif_tab_var is None and lst_motifs_disponibles_var is None)
@@ -165,12 +173,19 @@ class Namur(town.Town):
         str_table = "{}{}".format(str_table, "</table>")
         return str_table
 
+
     def total_with_tab_tiers(self, *args):
-        return str(
-            int(globals().get(args[0]) or "1")
-            * Decimal(globals().get(args[1]) or "1")
-            * (len(globals().get(args[2]) or "/"))
-        )
+        nb_tiers = 0
+        result = ""
+        if globals().get(args[2]) is not None:
+            for tiers in globals().get(args[2]):
+                if tiers[4].strip() in self.VALID_CP:
+                    nb_tiers = nb_tiers + 1
+            result = str(int(globals().get(args[0]) or '1') * Decimal(globals().get(args[1]) or '1')* nb_tiers)
+        else:
+            result = str(int(globals().get(args[0]) or '1') * Decimal(globals().get(args[1]) or '1'))
+        return result
+        # return str(int(globals().get(args[0]) or '1') * Decimal(globals().get(args[1]) or '1')* (len(globals().get(args[2]) or '/')))
 
 
 current_commune = Namur()
