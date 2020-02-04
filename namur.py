@@ -14,6 +14,11 @@ import town
 
 class Namur(town.Town):
     def __init__(self):
+        # Le cout des demarches de pop/ec s'effectue comme suit : 
+        # Si commande pour sois-même : Si on habite dans VALID_CP alors gratos sinon payant.
+        # Si commande pour un tiers : 
+        #                           - Si on est un "privé" alors, gratos si on est dans VALID_CP
+        #                           - Si on est un "professionnel" alors, gratos uniquement pour les tiers dans VALID_CP sinon payant.
         self.VALID_CP = ["5000", "5001", "5002", "5003", "5004", "5020", "5021", "5022", "5024", "5100", "5101"]
         super(Namur, self).__init__(variables=globals())
 
@@ -82,30 +87,37 @@ class Namur(town.Town):
 
     # before_2020 : Pour la gestion des actes avant 2020 ou apres 2020
     # integration des nouvelles reglementations de la BAEC.
+    # result = un coût
     def compute_standard_motivations_table(self, motif_tab_var, lst_motifs_disponibles_var, before_2020="True"):
-        if "acte-de-reconnaissance-d-enfant" in globals().get("form_slug"):
-            result = self.total_with_tab_tiers("form_var_nb_exemplaire", "form_option_cost", "form_var_tableau_tiers")
+        cp_demandeur = globals().get("form_var_cp_demandeur").strip()
+        if globals().get("form_var_nn_statut") == "Privé" and cp_demandeur in self.VALID_CP:
+            result = Decimal("0.00")
         else:
-            nb_tiers = len(globals().get('form_var_tableau_tiers')) if globals().get('form_var_tableau_tiers') is not None else 1
-            result = Decimal("0")
-            if str(before_2020) == "True" or before_2020 is None:
-                result = nb_tiers * Decimal(super(Namur, self).compute_standard_motivations_table(motif_tab_var, lst_motifs_disponibles_var))
+            # Il n'y a pas de tableau de motif sur l'acte de reconnaissance d'enfant.
+            if "acte-de-reconnaissance-d-enfant" in globals().get("form_slug"):
+                result = self.total_with_tab_tiers("form_var_nb_exemplaire", "form_option_cost", "form_var_tableau_tiers")
             else:
-                nb_doc = 1 if motif_tab_var is None else sum([0 if e[1] is None or e[1] == "" else int(e[1]) for e in motif_tab_var])
-                if globals().get("form_var_tableau_tiers") is not None:
-                    for tiers in globals().get("form_var_tableau_tiers"):
-                        if "acte-de-divorce" in globals().get("form_slug"):
-                            code_postal_tiers = tiers[7]
-                        elif "acte-de-mariage" in globals().get("form_slug"):
-                            code_postal_tiers = tiers[6]
-                        else:
-                            code_postal_tiers = tiers[4]
-                        if code_postal_tiers.strip() not in self.VALID_CP:
-                            result = result + Decimal(globals().get("form_option_cost"))
-                    result = nb_doc * result
+                nb_tiers = len(globals().get('form_var_tableau_tiers')) if globals().get('form_var_tableau_tiers') is not None else 1
+                result = Decimal("0")
+                if str(before_2020) == "True" or before_2020 is None:
+                    result = nb_tiers * Decimal(super(Namur, self).compute_standard_motivations_table(motif_tab_var, lst_motifs_disponibles_var))
                 else:
-                    if globals().get("form_var_cp_demandeur").strip() not in self.VALID_CP:
-                        result = nb_doc * Decimal(globals().get("form_option_cost"))
+                    nb_doc = 1 if motif_tab_var is None else sum([0 if e[1] is None or e[1] == "" else int(e[1]) for e in motif_tab_var])
+                    if globals().get("form_var_tableau_tiers") is not None:
+                        for tiers in globals().get("form_var_tableau_tiers"):
+                            if "acte-de-divorce" in globals().get("form_slug"):
+                                code_postal_tiers = tiers[7]
+                            elif "acte-de-mariage" in globals().get("form_slug"):
+                                code_postal_tiers = tiers[6]
+                            else:
+                                code_postal_tiers = tiers[4]
+                            # En tant que demandeur privé n'habitant pas à Namur et commandant pour des pers tiers habitant à Namur ou non, les démarches seront payantes
+                            if globals().get("form_var_nn_statut")=="Privé" or code_postal_tiers.strip() not in self.VALID_CP:
+                                result = result + Decimal(globals().get("form_option_cost"))
+                        result = nb_doc * result
+                    else:
+                        if cp_demandeur.strip() not in self.VALID_CP:
+                            result = nb_doc * Decimal(globals().get("form_option_cost"))
         return result
 
     # global_cost != 0 seulement si on n'utilise pas les motifs (motif_tab_var is None and lst_motifs_disponibles_var is None)
