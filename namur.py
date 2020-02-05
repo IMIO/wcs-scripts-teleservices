@@ -89,7 +89,7 @@ class Namur(town.Town):
     # integration des nouvelles reglementations de la BAEC.
     # result = un coût
     def compute_standard_motivations_table(self, motif_tab_var, lst_motifs_disponibles_var, before_2020="True"):
-        cp_demandeur = globals().get("form_var_cp_demandeur", "").strip()
+        cp_demandeur = (globals().get("form_var_cp_demandeur") or '').strip()
         if globals().get("form_var_nn_statut") == "Privé" and cp_demandeur in self.VALID_CP:
             result = Decimal("0.00")
         else:
