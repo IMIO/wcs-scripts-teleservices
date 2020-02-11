@@ -56,7 +56,7 @@ def cout_reservation(data):
             data.get("form_option_cout_resident")
             if data.get("form_var_code_postal") == commune_cp
             else data.get("form_option_cout_non_resident")
-        ) * len(data.get("form_var_semainestage_raw"))
+        ) * len(data.get("form_var_semainestage_raw") or "1")
     except:
         return "-1"
 
