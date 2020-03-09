@@ -421,3 +421,14 @@ class Town(object):
     def towntime_are_nn_all_differents(self, lst_nn):
         lst_without_none = [nn for nn in lst_nn if nn is not None]
         return len(lst_without_none) == len(set(lst_without_none))
+
+    # portail parent.
+    def get_dates_of_week_number(self, numweek, year):
+        if numweek.upper().startswith("S"):
+            d = "W{}/{}".format(numweek[1:], year)
+        else:
+            d = "W{}/{}".format(numweek, year)
+        monday = datetime.strptime("1/" + d, "%w/W%W/%Y")
+        delta = timedelta(days=5)
+        friday = monday + delta
+        return [monday.strftime("%d/%m/%Y"), friday.strftime("%d/%m/%Y")]
