@@ -27,7 +27,7 @@ class Verviers(town.Town):
         for item in data_sources_materiel:
             if item['id'] in kwargs:
                 price = item['unit_price_with_intervention'] if intervention == 'True' else item['unit_price']
-                total += price * kwargs[item['id']]
+                total += Decimal(price or 0) * Decimal(kwargs[item['id']] or 0)
         return str('total')
 
 current_commune = Verviers()
