@@ -17,7 +17,7 @@ def estim_loc_matos(data_source_materiel, intervention, demands):
     total = 0
     for item in data_source_materiel:
         if item['id'] in demands:
-            price = item['unit_price_with_intervention'] if intervention == 'True' else item['unit_price']
+            price = item['unit_price_with_intervention'] if intervention in [True,'True','Oui'] else item['unit_price']
             total += Decimal(price or 0) * Decimal(demands[item['id']] or 0)
     return total
 
