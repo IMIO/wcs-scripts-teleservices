@@ -1,46 +1,34 @@
 # -*- coding: utf-8 -*-
 import sys
+import os
 sys.path.insert(0, '/var/lib/wcs/scripts')
 sys.path.insert(0, '/var/lib/wcs-au-quotidien/scripts')
 import re
+import ast
+from decimal import Decimal 
 
-if 'town' in sys.modules:
-    del sys.modules['town']
+if os.path.dirname(__file__) not in sys.path:
+    sys.path.append(os.path.dirname(__file__))
 
-import town
+def estim_loc_matos(data_source_materiel, intervention, demands):
+    #data_sources_materiel is a data_sources which contains all materiel and prices with and without intervention
+    #intervention is a boolean from the form.
+    #demands is a dict that contains, for each field, the id of the var and his value, like this : {'nadars':'12','poubelles':'4'}
+    total = 0
+    for item in data_source_materiel:
+        if item['id'] in demands:
+            price = item['unit_price_with_intervention'] if intervention == 'True' else item['unit_price']
+            total += Decimal(price or 0) * Decimal(demands[item['id']] or 0)
+    return total
 
 
-class Verviers(town.Town):
+arguments = [argument for argument in args]
+if arguments[0] == "estim_loc_matos":
+    demands = ast.literal_eval(arguments[3])
+    for key in demands.keys():
+        var = 'form_var_' + key
+        demands[key] = vars().get(var)
+    result = str(estim_loc_matos(data_source.materiel, vars().get(arguments[2]), demands))
 
-    def __init__(self):
-        super(Verviers, self).__init__(variables=globals())
-        self.lst_motifs_dispo = globals().get('form_option_motifs_disponibles_structured')
-
-    def helloworld(self, args):
-        return 'hello'
-
-    def estim_loc_matos (data_sources_materiel, intervention, **kwargs):
-        #data_sources_materiel is a data_sources which contains all materiel and prices with and without intervention
-        #intervention is a boolean from the form.
-        #**kwargs contains, for each field, the name of the var and his value
-        total = 0
-        for item in data_sources_materiel:
-            if item['id'] in kwargs:
-                price = item['unit_price_with_intervention'] if intervention == 'True' else item['unit_price']
-                total += Decimal(price or 0) * Decimal(kwargs[item['id']] or 0)
-        return str('total')
-
-current_commune = Verviers()
-function = args[0]
-
-functionList = {function: getattr(current_commune,function)}
-if args[1] is not None:
-    parameters = args[1]
-    if isinstance(parameters, dict):
-        result = functionList[function](**parameters)
-    else:
-        params = args[1:]
-        result = functionList[function](*params)
-else:
-    result = functionList[function]()
+    
 
