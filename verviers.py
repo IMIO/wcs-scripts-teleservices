@@ -13,7 +13,7 @@ if os.path.dirname(__file__) not in sys.path:
 def estim_loc_matos(data_source_materiel, intervention, demands):
     #data_sources_materiel is a data_sources which contains all materiel and prices with and without intervention
     #intervention is a boolean from the form.
-    #**kwargs contains, for each field, the name of the var and his value
+    #demands is a dictionnary that contains, for each field, the name of the var and his value
     total = 0
     for item in data_source_materiel:
         if item['id'] in demands:
