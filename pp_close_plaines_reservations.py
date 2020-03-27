@@ -38,27 +38,36 @@ def sign_string(s, key, algo='sha256', timedelta=30):
     return hash.digest()
 
 def close_plaines_reservation(context):
+    ID_STATUS_CLOTURE = "5"
     first_date_other_demand = None
     last_date_other_demand = None
+    is_close = False
     cpt = 0
     demarches_closed = []
     for formdef in FormDef.select(lambda x: x.url_name=="aes-inscrire-mon-enfant-a-une-plaine"):
         option_first_date = formdef.workflow_options.get("first_date_plain")
         option_last_date = formdef.workflow_options.get("last_date_plain")
         for formdata in formdef.data_class().select(lambda y: y.user_id == str(context.get("form_user").id)):
-            for field in formdef.get_all_fields(): # les autres champs
-                if not hasattr(field, 'get_view_value'): # sauf les titres, etc.
+            if formdata.status != "draft":
+                if formdata.get_status().id == ID_STATUS_CLOTURE and formdata.id != int(context.get("form_number_raw")):
                     continue
-                if field.varname == "reg_first_date_plaine":
-                    first_date_other_demand = formdata.get_field_view_value(field) or option_first_date
-                if field.varname == "reg_last_date_plaine":
-                    last_date_other_demand = formdata.get_field_view_value(field) or option_last_date
-            if(context.get("form_var_reg_first_date_plaine") == first_date_other_demand and context.get("form_var_reg_last_date_plaine") == last_date_other_demand):
-                url = "{}/portail-parent/aes-inscrire-mon-enfant-a-une-plaine/{}/jump/trigger/cloture".format(context.get("site_url"), formdata.id)
-                url = sign_url(url, "d3c18cf7354042661b0cd20ebd9b628b6c021b9b6c3dcd186df5780889798bfb", orig="montsaintguibert-formulaires.guichet-citoyen.be")
-                # print ("{} {} - {} {}".format(first_date, first_date_other_demand, last_date, last_date_other_demand))
-                requests.post(url)
-                demarches_closed.append(str(formdata.id))
+                else:
+                    # On balaie les champs de la demande "formdata"
+                    for field in formdef.get_all_fields(): # les autres champs
+                        if not hasattr(field, 'get_view_value'): # sauf les titres, etc.
+                            continue
+                        if field.varname == "reg_first_date_plaine":
+                            first_date_other_demand = formdata.get_field_view_value(field) or option_first_date
+                        if field.varname == "reg_last_date_plaine":
+                            last_date_other_demand = formdata.get_field_view_value(field) or option_last_date
+                        if field.varname == "is_close":
+                            is_close = bool(formdata.get_field_view_value(field))
+                    if(context.get("form_var_reg_first_date_plaine") == first_date_other_demand and context.get("form_var_reg_last_date_plaine") == last_date_other_demand and is_close is False):
+                        url = "{}/portail-parent/aes-inscrire-mon-enfant-a-une-plaine/{}/jump/trigger/cloture".format(context.get("site_url"), formdata.id)
+                        url = sign_url(url, "d3c18cf7354042661b0cd20ebd9b628b6c021b9b6c3dcd186df5780889798bfb", orig="montsaintguibert-formulaires.guichet-citoyen.be")
+                        # print ("{} {} - {} {}".format(first_date, first_date_other_demand, last_date, last_date_other_demand))
+                        requests.post(url)
+                        demarches_closed.append(str(formdata.id))
     return ",".join(demarches_closed)
 
 
