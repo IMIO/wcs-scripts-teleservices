@@ -6,13 +6,7 @@ sys.path.insert(0, '/var/lib/wcs/scripts')
 sys.path.insert(0, '/var/lib/wcs-au-quotidien/scripts')
 
 def how_many_encoded_diseases(context):
-    if context.get('form_var_maladies') is None:
-        diseases = []
-    if context.get('form_var_autres_maladies') is None:
-        other_diseases = []
-
-    result = len(diseases) + len(other_diseases)
-    
-    return result
+    return len(context.get('form_var_diseases_raw') or []) + len(context.get('form_var_other_diseases') or [])
 
 result = how_many_encoded_diseases(vars())
+
