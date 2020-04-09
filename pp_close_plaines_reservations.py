@@ -37,8 +37,8 @@ def sign_string(s, key, algo='sha256', timedelta=30):
     hash = hmac.HMAC(key, digestmod=digestmod, msg=s)
     return hash.digest()
 
-def close_plaines_reservation(context):
-    ID_STATUS_CLOTURE = "5"
+def loop_on_demands(context):
+    ID_STATUS_CLOSED_AND_PAID = "11"
     first_date_other_demand = None
     last_date_other_demand = None
     is_close = False
@@ -49,7 +49,7 @@ def close_plaines_reservation(context):
         option_last_date = formdef.workflow_options.get("last_date_plain")
         for formdata in formdef.data_class().select(lambda y: y.user_id == str(context.get("form_user").id)):
             if formdata.status != "draft":
-                if formdata.get_status().id == ID_STATUS_CLOTURE and formdata.id != int(context.get("form_number_raw")):
+                if formdata.get_status().id == ID_STATUS_CLOSED_AND_PAID and formdata.id != int(context.get("form_number_raw")):
                     continue
                 else:
                     # On balaie les champs de la demande "formdata"
@@ -63,12 +63,26 @@ def close_plaines_reservation(context):
                         if field.varname == "is_close":
                             is_close = bool(formdata.get_field_view_value(field))
                     if(context.get("form_var_reg_first_date_plaine") == first_date_other_demand and context.get("form_var_reg_last_date_plaine") == last_date_other_demand and is_close is False):
-                        url = "{}/portail-parent/aes-inscrire-mon-enfant-a-une-plaine/{}/jump/trigger/cloture".format(context.get("site_url"), formdata.id)
-                        url = sign_url(url, "d3c18cf7354042661b0cd20ebd9b628b6c021b9b6c3dcd186df5780889798bfb", orig="montsaintguibert-formulaires.guichet-citoyen.be")
-                        # print ("{} {} - {} {}".format(first_date, first_date_other_demand, last_date, last_date_other_demand))
-                        requests.post(url)
+                        close_plaines_reservation(context, formdata.id)
+                        # on ne fait un append que si on passe bien ici pour s'assurer de n'avoir que des ids sur qui on a realise le declencheur
                         demarches_closed.append(str(formdata.id))
+                    else:
+                        if(context.get("form_var_reg_first_date_plaine") == first_date_other_demand and context.get("form_var_reg_last_date_plaine") == last_date_other_demand and is_close is True):
+                            closed_and_paid(context, formdata.id)
+                            # on ne fait un append que si on passe bien ici pour s'assurer de n'avoir que des ids sur qui on a realise le declencheur
+                            demarches_closed.append(str(formdata.id))
     return ",".join(demarches_closed)
 
+def close_plaines_reservation(context, form_id):
+    url = "{}/portail-parent/aes-inscrire-mon-enfant-a-une-plaine/{}/jump/trigger/cloture".format(context.get("site_url"), form_id)
+    url = sign_url(url, "d3c18cf7354042661b0cd20ebd9b628b6c021b9b6c3dcd186df5780889798bfb", orig="montsaintguibert-formulaires.guichet-citoyen.be")
+    # print ("{} {} - {} {}".format(first_date, first_date_other_demand, last_date, last_date_other_demand))
+    requests.post(url)
 
-result = close_plaines_reservation(vars())
+def closed_and_paid(context, form_id):
+    url = "{}/portail-parent/aes-inscrire-mon-enfant-a-une-plaine/{}/jump/trigger/closed_and_paid".format(context.get("site_url"), form_id)
+    url = sign_url(url, "d3c18cf7354042661b0cd20ebd9b628b6c021b9b6c3dcd186df5780889798bfb", orig="montsaintguibert-formulaires.guichet-citoyen.be")
+    requests.post(url)
+
+
+result = loop_on_demands(vars())
