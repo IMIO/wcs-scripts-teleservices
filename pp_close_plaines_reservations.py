@@ -2,7 +2,11 @@ import random
 import requests, base64, hmac, hashlib, datetime
 import time
 import urllib
-import urlparse
+try:
+    import urlparse
+except:
+    # Python3
+    import urllib.parse
 
 from hashlib import sha256
 from wcs.formdef import FormDef
