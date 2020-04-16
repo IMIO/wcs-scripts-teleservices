@@ -10,9 +10,17 @@ binOps = {
     ast.Add: operator.add,
     ast.Sub: operator.sub,
     ast.Mult: operator.mul,
-    ast.Div: operator.div,
+    ast.Div: operator.truediv,
     ast.Mod: operator.mod,
 }
+
+
+def find_week(params):
+    week = params.get("week")
+    lst = params.get("lst")
+    ### lst sample : ['S27_01/07/2020', 'S27_02/07/2020', 'S27_03/07/2020']
+    import ipdb;ipdb.set_trace()
+    return [day for day in lst if week in day]
 
 
 class Town(object):
@@ -422,7 +430,29 @@ class Town(object):
         lst_without_none = [nn for nn in lst_nn if nn is not None]
         return len(lst_without_none) == len(set(lst_without_none))
 
-    # portail parent.
+    def get_roles(self, *args):
+        user = globals().get("session_user")
+        form = globals().get("form_objects")._formdef
+        for q in user.get_roles():
+            if q in form.roles:
+                return True
+        return False
+
+    # Pratique pour prendre le raw d'un champs date et pour récupérer une string formattée comme on veut.
+    # exemple dt_format : %Y-%m-%d ou %d/%m/%Y ,...
+    def struct_time_to_str(self, struct_time, dt_format):
+        str = datetime(*struct_time[:3]).strftime(dt_format)
+        return str
+
+    # deprecated
+    # def get_dates_of_week_number(self, numweek, lst_days):
+    #     days = list(filter(find_week, {"week":numweek, "lst":lst_days}))
+    #     firstday = datetime.strptime(days[0].split("_")[1], "%d/%m/%Y")
+    #     lastday = datetime.strptime(days[-1:].split("_")[1], "%d/%m/%Y")
+    #     str_firstday = firstday.strftime("%A %d/%m/%Y")
+    #     str_lastday = lastday.strftime("%A %d/%m/%Y")
+    #     return [str_firstday, str_lastday]
+
     def get_dates_of_week_number(self, numweek, year):
         if numweek.upper().startswith("S"):
             d = "W{}/{}".format(numweek[1:], year)
@@ -432,3 +462,4 @@ class Town(object):
         delta = timedelta(days=5)
         friday = monday + delta
         return [monday.strftime("%d/%m/%Y"), friday.strftime("%d/%m/%Y")]
+
