@@ -39,7 +39,7 @@ def get_disease_from_index (data_source, diseases, other_diseases, index):
     return result
  
 
-if vars().get('args')[0] == "get_disease_from_index":
+if "args" in vars() and vars().get('args')[0] == "get_disease_from_index":
     if len(args) == 4:
         result = get_disease_from_index(data_source.maladies, vars().get(args[1]), vars().get(args[2]), vars().get('args')[3])
     else:
