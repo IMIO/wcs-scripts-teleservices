@@ -41,7 +41,7 @@ def repas_valid_date(self, jour_de_reference, heure_de_reference, nb_sem_to_skip
 
 if globals().get('args') is None:
     # repas_valid_date('thirday','9',1,2)
-    print '.'
+    print('.')
 else:
     current_commune = Tintigny()
     function = args[0]
