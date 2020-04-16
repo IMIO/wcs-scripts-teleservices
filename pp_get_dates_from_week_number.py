@@ -42,4 +42,4 @@ WEEK = CONTEXT.get("form_var_current_validating_week","").upper()
 result = get_dates_from_week_number(CONTEXT)
 
 if DEBUG is True:
-    print result
+    print(result)
