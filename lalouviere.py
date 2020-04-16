@@ -185,9 +185,9 @@ class Lalouviere(town.Town):
 if vars().get('args') is None:
     # test
     ll = Lalouviere()
-    print str(ll.is_deadline_ok('4/5/2018','8/5/2018',legal_holidays=[['30/4/2018'],['1/5/2018']]))
-    print str(ll.dyn_tab_format_mail(['Taxe','Article de rôle','Exercice fiscal','Montant'],
-                                        [['ovp', '7765', '852']] ))
+    print(str(ll.is_deadline_ok('4/5/2018','8/5/2018',legal_holidays=[['30/4/2018'],['1/5/2018']])))
+    print(str(ll.dyn_tab_format_mail(['Taxe','Article de rôle','Exercice fiscal','Montant'],
+                                        [['ovp', '7765', '852']] )))
 else:
     current_commune = Lalouviere()
     function = args[0]
