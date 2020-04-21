@@ -21,6 +21,15 @@ class Commune(town.Town):
         else:
             return False
 
+    def get_roles(self, *args):
+        user = globals().get("session_user")
+        form = globals().get("form_objects")._formdef
+        for q in user.get_roles():
+            if q in form.roles:
+                return True
+        return False
+
+    # Pratique pour prendre le raw d'un champs date et pour récupérer une string formattée comme on veut.
 current_commune = Commune()
 function = args[0]
 

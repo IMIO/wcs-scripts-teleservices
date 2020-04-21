@@ -430,15 +430,6 @@ class Town(object):
         lst_without_none = [nn for nn in lst_nn if nn is not None]
         return len(lst_without_none) == len(set(lst_without_none))
 
-    def get_roles(self, *args):
-        user = globals().get("session_user")
-        form = globals().get("form_objects")._formdef
-        for q in user.get_roles():
-            if q in form.roles:
-                return True
-        return False
-
-    # Pratique pour prendre le raw d'un champs date et pour récupérer une string formattée comme on veut.
     # exemple dt_format : %Y-%m-%d ou %d/%m/%Y ,...
     def struct_time_to_str(self, struct_time, dt_format):
         str = datetime(*struct_time[:3]).strftime(dt_format)
