@@ -36,7 +36,7 @@ def get_disease_from_index (data_source, diseases, other_diseases, index):
         result = other_diseases[index][0]
     
     # return result
-    return result
+    return result or 'Maladie {}'.format(str(index))
  
 
 if "args" in vars() and vars().get('args')[0] == "get_disease_from_index":
