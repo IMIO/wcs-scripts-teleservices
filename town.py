@@ -19,7 +19,6 @@ def find_week(params):
     week = params.get("week")
     lst = params.get("lst")
     ### lst sample : ['S27_01/07/2020', 'S27_02/07/2020', 'S27_03/07/2020']
-    import ipdb;ipdb.set_trace()
     return [day for day in lst if week in day]
 
 

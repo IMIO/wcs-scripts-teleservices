@@ -9,13 +9,14 @@ except:
     import urllib.parse
 
 from hashlib import sha256
+from quixote import get_request, get_publisher
 from wcs.formdef import FormDef
 
 
 def sign_url(url, key, algo="sha256", orig=None, timestamp=None, nonce=None):
-    parsed = urlparse.urlparse(url)
+    parsed = urllib.parse.urlparse(url)
     new_query = sign_query(parsed.query, key, algo, orig, timestamp, nonce)
-    return urlparse.urlunparse(parsed[:4] + (new_query,) + parsed[5:])
+    return urllib.parse.urlunparse(parsed[:4] + (new_query,) + parsed[5:])
 
 
 def sign_query(query, key, algo="sha256", orig=None, timestamp=None, nonce=None):
@@ -27,19 +28,19 @@ def sign_query(query, key, algo="sha256", orig=None, timestamp=None, nonce=None)
     new_query = query
     if new_query:
         new_query += "&"
-    new_query += urllib.urlencode(
+    new_query += urllib.parse.urlencode(
         (("algo", algo), ("timestamp", timestamp), ("nonce", nonce))
     )
     if orig is not None:
-        new_query += "&" + urllib.urlencode({"orig": orig})
+        new_query += "&" + urllib.parse.urlencode({"orig": orig})
     signature = base64.b64encode(sign_string(new_query, key, algo=algo))
-    new_query += "&" + urllib.urlencode({"signature": signature})
+    new_query += "&" + urllib.parse.urlencode({"signature": signature})
     return new_query
 
 
 def sign_string(s, key, algo="sha256", timedelta=30):
     digestmod = getattr(hashlib, algo)
-    hash = hmac.HMAC(key, digestmod=digestmod, msg=s)
+    hash = hmac.HMAC(bytes(key,"utf-8"), digestmod=digestmod, msg=bytes(s,"utf-8"))
     return hash.digest()
 
 
@@ -113,10 +114,12 @@ def close_plaines_reservation(context, form_id):
     url = "{}/portail-parent/aes-inscrire-mon-enfant-a-une-plaine/{}/jump/trigger/cloture".format(
         context.get("site_url"), form_id
     )
+    orig = eservices_url.replace("https://","").replace("/","")
+    key = get_publisher().get_site_option(orig, 'api-secrets')
     url = sign_url(
         url,
-        "d3c18cf7354042661b0cd20ebd9b628b6c021b9b6c3dcd186df5780889798bfb",
-        orig="montsaintguibert-formulaires.guichet-citoyen.be",
+        key,
+        orig=orig,
     )
     # print ("{} {} - {} {}".format(first_date, first_date_other_demand, last_date, last_date_other_demand))
     requests.post(url)
@@ -126,10 +129,12 @@ def closed_and_paid(context, form_id):
     url = "{}/portail-parent/aes-inscrire-mon-enfant-a-une-plaine/{}/jump/trigger/closed_and_paid".format(
         context.get("site_url"), form_id
     )
+    orig = eservices_url.replace("https://","").replace("/","")
+    key = get_publisher().get_site_option(orig, 'api-secrets')
     url = sign_url(
         url,
-        "d3c18cf7354042661b0cd20ebd9b628b6c021b9b6c3dcd186df5780889798bfb",
-        orig="montsaintguibert-formulaires.guichet-citoyen.be",
+        key,
+        orig=orig,
     )
     requests.post(url)
 
