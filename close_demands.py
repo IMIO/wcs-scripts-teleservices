@@ -60,7 +60,7 @@ def get_close_demands(formdef, coords, context):
             yield formdata
 
 
-if __name__ in ("__builtin__") and "form_objects" in vars():
+if __name__ in ("__builtins__") and "form_objects" in vars():
     coords = get_coords(vars())
     if coords or True:
         result = get_close_demands(form_objects.formdef, coords, vars())

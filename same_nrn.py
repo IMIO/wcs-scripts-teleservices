@@ -19,5 +19,5 @@ def find_same_nrn(formdef, context, *args):
     return result
 
 
-if __name__ in ("__builtin__") and "form_objects" in vars():
+if __name__ in ("__builtins__") and "form_objects" in vars():
     result = find_same_nrn(form_objects.formdef, vars(), *args)
