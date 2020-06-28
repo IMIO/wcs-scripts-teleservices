@@ -3,6 +3,7 @@ import requests, base64, hmac, hashlib, datetime
 import time
 import urllib
 try:
+    # noinspection PyCompatibility
     import urlparse
 except:
     # Python3
