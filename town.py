@@ -342,7 +342,7 @@ class Town(object):
             else:
                 return False
         previousModulo = 0
-        for i in xrange(0, len(numericIbanString), 5):
+        for i in range(0, len(numericIbanString), 5):
             subpart = str(previousModulo) + "" + numericIbanString[i: i + 5]
             previousModulo = int(subpart) % ibanValidationModulo
         return previousModulo == 1
