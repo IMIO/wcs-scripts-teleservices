@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.24] - 19/03/2021 -
+### Changed
+  - [nhi] : add script to get monday's date of a given week
+
 ## [0.0.23] - 23/11/2020 -
 ### Changed
   - [nse, nhi] : add fields_bloc to calculate the total from datasource additional key
