@@ -46,7 +46,7 @@ def sign_string(s, key, algo="sha256", timedelta=30):
 
 
 def loop_on_demands(context):
-    ID_STATUS_CLOSED_AND_PAID = "11"
+    ID_STATUS_CLOSED_AND_PAID = "24"
     first_date_other_demand = None
     last_date_other_demand = None
     is_close = False
@@ -61,7 +61,7 @@ def loop_on_demands(context):
         for formdata in formdef.data_class().select(
             lambda y: y.user_id == str(context.get("form_user").id)
         ):
-            if formdata.status != "draft":
+            if formdata.status != "draft" and formdata.get_status() is not None:
                 if formdata.get_status().id == ID_STATUS_CLOSED_AND_PAID and formdata.id != int(
                     context.get("form_number_raw")
                 ):
