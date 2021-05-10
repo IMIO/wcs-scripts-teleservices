@@ -130,7 +130,7 @@ def close_plaines_reservation(context, form_id):
     url = "{}/portail-parent/aes-inscrire-mon-enfant-a-une-plaine/{}/jump/trigger/cloture".format(
         context.get("site_url"), form_id
     )
-    orig = eservices_url.replace("https://","").replace("/","")
+    orig = site_url.replace("https://","").replace("http://","")
     key = get_publisher().get_site_option(orig, 'api-secrets')
     url = sign_url(
         url,
@@ -145,7 +145,7 @@ def closed_and_paid(context, form_id):
     url = "{}/portail-parent/aes-inscrire-mon-enfant-a-une-plaine/{}/jump/trigger/closed_and_paid".format(
         context.get("site_url"), form_id
     )
-    orig = eservices_url.replace("https://","").replace("/","")
+    orig = site_url.replace("https://","").replace("http://","")
     key = get_publisher().get_site_option(orig, 'api-secrets')
     url = sign_url(
         url,

@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.26] - 10/05/2021 -
+### Changed
+  - [nhi] : return exception when it occurs when closing plains
+  - [nhi] : use site_url instead of eservices_url
+
 ## [0.0.25] - 10/05/2021 -
 ### Changed
   - [nhi] : do not loop on demands without status
