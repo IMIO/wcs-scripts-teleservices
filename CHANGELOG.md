@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.25] - 10/05/2021 -
+### Changed
+  - [nhi] : do not loop on demands without status
+
 ## [0.0.24] - 19/03/2021 -
 ### Changed
   - [nhi] : add script to get monday's date of a given week
