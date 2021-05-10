@@ -2,6 +2,8 @@ import random
 import requests, base64, hmac, hashlib, datetime
 import time
 import urllib
+import sys
+import linecache
 try:
     # noinspection PyCompatibility
     import urlparse
@@ -12,6 +14,16 @@ except:
 from hashlib import sha256
 from quixote import get_request, get_publisher
 from wcs.formdef import FormDef
+
+
+def print_exception():
+    exc_type, exc_obj, tb = sys.exc_info()
+    f = tb.tb_frame
+    lineno = tb.tb_lineno
+    filename = f.f_code.co_filename
+    linecache.checkcache(filename)
+    line = linecache.getline(filename, lineno, f.f_globals)
+    return 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), str(exc_obj))
 
 
 def sign_url(url, key, algo="sha256", orig=None, timestamp=None, nonce=None):
@@ -53,62 +65,65 @@ def loop_on_demands(context):
     was_in_basket = False
     cpt = 0
     demarches_closed = []
-    for formdef in FormDef.select(
-        lambda x: x.url_name == "aes-inscrire-mon-enfant-a-une-plaine"
-    ):
-        option_first_date = formdef.workflow_options.get("first_date_plain")
-        option_last_date = formdef.workflow_options.get("last_date_plain")
-        for formdata in formdef.data_class().select(
-            lambda y: y.user_id == str(context.get("form_user").id)
+    try:
+        for formdef in FormDef.select(
+            lambda x: x.url_name == "aes-inscrire-mon-enfant-a-une-plaine"
         ):
-            if formdata.status != "draft" and formdata.get_status() is not None:
-                if formdata.get_status().id == ID_STATUS_CLOSED_AND_PAID and formdata.id != int(
-                    context.get("form_number_raw")
-                ):
-                    continue
-                else:
-                    # On balaie les champs de la demande "formdata"
-                    for field in formdef.get_all_fields():  # les autres champs
-                        if not hasattr(
-                            field, "get_view_value"
-                        ):  # sauf les titres, etc.
-                            continue
-                        if field.varname == "reg_first_date_plaine":
-                            first_date_other_demand = (
-                                formdata.get_field_view_value(field)
-                                or option_first_date
-                            )
-                        if field.varname == "reg_last_date_plaine":
-                            last_date_other_demand = (
-                                formdata.get_field_view_value(field) or option_last_date
-                            )
-                        if field.varname == "is_close":
-                            is_close = bool(formdata.get_field_view_value(field))
-                        if field.varname == "was_in_basket":
-                            was_in_basket = bool(formdata.get_field_view_value(field))
-                    if (
-                        context.get("form_var_reg_first_date_plaine")
-                        == first_date_other_demand
-                        and context.get("form_var_reg_last_date_plaine")
-                        == last_date_other_demand
-                        and is_close is False
+            option_first_date = formdef.workflow_options.get("first_date_plain")
+            option_last_date = formdef.workflow_options.get("last_date_plain")
+            for formdata in formdef.data_class().select(
+                lambda y: y.user_id == str(context.get("form_user").id)
+            ):
+                if formdata.status != "draft" and formdata.get_status() is not None:
+                    if formdata.get_status().id == ID_STATUS_CLOSED_AND_PAID and formdata.id != int(
+                        context.get("form_number_raw")
                     ):
-                        close_plaines_reservation(context, formdata.id)
-                        # on ne fait un append que si on passe bien ici pour s'assurer de n'avoir que des ids sur qui on a realise le declencheur
-                        demarches_closed.append(str(formdata.id))
+                        continue
                     else:
+                        # On balaie les champs de la demande "formdata"
+                        for field in formdef.get_all_fields():  # les autres champs
+                            if not hasattr(
+                                field, "get_view_value"
+                            ):  # sauf les titres, etc.
+                                continue
+                            if field.varname == "reg_first_date_plaine":
+                                first_date_other_demand = (
+                                    formdata.get_field_view_value(field)
+                                    or option_first_date
+                                )
+                            if field.varname == "reg_last_date_plaine":
+                                last_date_other_demand = (
+                                    formdata.get_field_view_value(field) or option_last_date
+                                )
+                            if field.varname == "is_close":
+                                is_close = bool(formdata.get_field_view_value(field))
+                            if field.varname == "was_in_basket":
+                                was_in_basket = bool(formdata.get_field_view_value(field))
                         if (
                             context.get("form_var_reg_first_date_plaine")
                             == first_date_other_demand
                             and context.get("form_var_reg_last_date_plaine")
                             == last_date_other_demand
-                            and is_close is True
-                            and was_in_basket is False
+                            and is_close is False
                         ):
-                            closed_and_paid(context, formdata.id)
+                            close_plaines_reservation(context, formdata.id)
                             # on ne fait un append que si on passe bien ici pour s'assurer de n'avoir que des ids sur qui on a realise le declencheur
                             demarches_closed.append(str(formdata.id))
-    return ",".join(demarches_closed)
+                        else:
+                            if (
+                                context.get("form_var_reg_first_date_plaine")
+                                == first_date_other_demand
+                                and context.get("form_var_reg_last_date_plaine")
+                                == last_date_other_demand
+                                and is_close is True
+                                and was_in_basket is False
+                            ):
+                                closed_and_paid(context, formdata.id)
+                                # on ne fait un append que si on passe bien ici pour s'assurer de n'avoir que des ids sur qui on a realise le declencheur
+                                demarches_closed.append(str(formdata.id))
+        return ",".join(demarches_closed)
+    except:
+        return print_exception()
 
 
 def close_plaines_reservation(context, form_id):
