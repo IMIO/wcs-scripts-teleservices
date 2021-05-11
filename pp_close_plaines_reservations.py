@@ -64,7 +64,7 @@ def loop_on_demands(context):
     is_close = False
     was_in_basket = False
     cpt = 0
-    demarches_closed = []
+    demarches_closed = [context.get('form_number_raw')]
     try:
         for formdef in FormDef.select(
             lambda x: x.url_name == "aes-inscrire-mon-enfant-a-une-plaine"
@@ -105,23 +105,24 @@ def loop_on_demands(context):
                             and context.get("form_var_reg_last_date_plaine")
                             == last_date_other_demand
                             and is_close is False
+                            and formdata.get_status() in ['8', '9']
                         ):
                             close_plaines_reservation(context, formdata.id)
                             # on ne fait un append que si on passe bien ici pour s'assurer de n'avoir que des ids sur qui on a realise le declencheur
                             demarches_closed.append(str(formdata.id))
-                        else:
-                            if (
-                                context.get("form_var_reg_first_date_plaine")
-                                == first_date_other_demand
-                                and context.get("form_var_reg_last_date_plaine")
-                                == last_date_other_demand
-                                and is_close is True
-                                and was_in_basket is False
-                            ):
-                                closed_and_paid(context, formdata.id)
-                                # on ne fait un append que si on passe bien ici pour s'assurer de n'avoir que des ids sur qui on a realise le declencheur
-                                demarches_closed.append(str(formdata.id))
-        return ",".join(demarches_closed)
+                        elif (
+                            context.get("form_var_reg_first_date_plaine")
+                            == first_date_other_demand
+                            and context.get("form_var_reg_last_date_plaine")
+                            == last_date_other_demand
+                            and is_close is True
+                            and was_in_basket is False
+                            and formdata.get_status() == '5'
+                        ):
+                            closed_and_paid(context, formdata.id)
+                            # on ne fait un append que si on passe bien ici pour s'assurer de n'avoir que des ids sur qui on a realise le declencheur
+                            demarches_closed.append(str(formdata.id))
+        return ",".join(set(demarches_closed))
     except:
         return print_exception()
 

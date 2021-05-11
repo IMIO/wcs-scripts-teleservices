@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.27] - 11/05/2021 -
+### Changed
+  - [nhi] : filter user's demands on status id
+
 ## [0.0.26] - 10/05/2021 -
 ### Changed
   - [nhi] : return exception when it occurs when closing plains
