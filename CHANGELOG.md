@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.28] - 15/06/2021 -
+### Changed
+  - [mbr] : add script to compute price for bloc fields
+
 ## [0.0.27] - 11/05/2021 -
 ### Changed
   - [nhi] : filter user's demands on status id
