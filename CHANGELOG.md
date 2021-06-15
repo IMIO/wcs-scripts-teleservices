@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.29] - 15/06/2021 -
+### Changed
+  - [nhi] : fix script to compute for bloc field
+
 ## [0.0.28] - 15/06/2021 -
 ### Changed
   - [mbr] : add script to compute price for bloc fields
