@@ -18,4 +18,4 @@ try:
     liste = requests.get(args[0], headers=headers).json()
     result = tri_rendez_vous(liste, args[1])
 except Exception as e:
-    result = str(e)
+    None
