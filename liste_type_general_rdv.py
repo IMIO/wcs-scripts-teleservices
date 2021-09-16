@@ -9,7 +9,7 @@ def tri_rendez_vous(liste):
     :return: liste du type de rendez-vous sans le nombre de personnes
     """
     
-    return set([re.sub(r" (pour|-) [0-9]+ personne(s)?$", "", x["text"]) for x in liste["data"]])
+    return return list(set([re.sub(r" (pour|-) [0-9]+ personne(s)?$", "", x["text"]) for x in liste["data"]]))
 
 
 try:
