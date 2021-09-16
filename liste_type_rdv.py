@@ -8,7 +8,7 @@ def tri_rendez_vous(liste, variable):
     :param variable: str type de rendez-vous sélectionné
     :return: liste du type de rendez-vous avec nombre de personne
     """
-    return set([x for x in liste["data"] if variable in x["text"]])
+    return [x for x in liste["data"] if variable in x["text"]]
 
 
 try:
