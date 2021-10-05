@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.35] - 15/06/2021 -
+### Changed
+  - [dmshd] : [INFRA-4003] [TELE-1119] add -k to avoid SSL error following the Infra advice about that
+
 ## [0.0.29] - 15/06/2021 -
 ### Changed
   - [nhi] : fix script to compute for bloc field
