@@ -35,7 +35,7 @@ resultat = True
 for indisponibilite in indisponibilites_salles:
     debut_location = datetime.datetime.strptime(indisponibilite["StartDate"][:16], format_date)
     fin_location = datetime.datetime.strptime(indisponibilite["EndDate"][:16], format_date)
-    if debut_location < datetime_debut_demande < fin_location or debut_location < datetime_fin_demande < fin_location:
+    if debut_location <= datetime_debut_demande <= fin_location or debut_location <= datetime_fin_demande <= fin_location:
         resultat = False
 
 result = resultat
