@@ -28,11 +28,14 @@ datetime_fin_demande = datetime.datetime.combine(date_fin_demande, heure_fin_dem
 # string format for Atal datetime
 format_date = "%Y-%m-%dT%H:%M"
 
+# morceau de feuille
+resultat = True
+
 # parcours des indisponibilités si une date tombe en même temps que la date d'une demande retourne False
 for indisponibilite in indisponibilites_salles:
     debut_location = datetime.datetime.strptime(indisponibilite["StartDate"][:16], format_date)
     fin_location = datetime.datetime.strptime(indisponibilite["EndDate"][:16], format_date)
     if debut_location < datetime_debut_demande < fin_location or debut_location < datetime_fin_demande < fin_location:
-        result = False
+        resultat = False
 
-result = True
+result = resultat
