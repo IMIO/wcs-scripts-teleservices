@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 import sys
 import os
 sys.path.insert(0, '/var/lib/wcs/scripts')
 sys.path.insert(0, '/var/lib/wcs-au-quotidien/scripts')
-import re
 import ast
 from decimal import Decimal 
 
@@ -18,7 +16,12 @@ def estim_loc_matos(data_source_materiel, intervention, demands):
     for item in data_source_materiel:
         if item['id'] in demands:
             price = item['unit_price_with_intervention'] if intervention in [True,'True','Oui'] else item['unit_price']
-            total += Decimal(price or 0) * Decimal(demands[item['id']] or 0)
+            try:
+                number_items = Decimal(demands[item['id']])
+            except Exception as e:
+                number_items = 0
+            number_items
+            total += Decimal(price or 0) * number_items
     return total
 
 
