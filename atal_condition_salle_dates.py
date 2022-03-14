@@ -1,5 +1,3 @@
-# Script pour vérifier que les dates encodées par l'utilisateur ne sont libre pour la location de la salle
-
 import datetime
 import time
 
@@ -32,10 +30,10 @@ format_date = "%Y-%m-%dT%H:%M"
 resultat = True
 
 # parcours des indisponibilités si une date tombe en même temps que la date d'une demande retourne False
-for indisponibilite in indisponibilites_salles:
+for indisponibilite in indisponibilites_salles["data"]:
     debut_location = datetime.datetime.strptime(indisponibilite["StartDate"][:16], format_date)
     fin_location = datetime.datetime.strptime(indisponibilite["EndDate"][:16], format_date)
-    if debut_location <= datetime_debut_demande <= fin_location or debut_location <= datetime_fin_demande <= fin_location:
+    if debut_location <= datetime_debut_demande <= fin_location or debut_location <= datetime_fin_demande <= fin_location or (datetime_debut_demande <= debut_location and fin_location <=  datetime_fin_demande):
         resultat = False
 
 result = resultat
