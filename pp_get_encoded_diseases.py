@@ -27,7 +27,7 @@ def get_disease_from_index (data_source, diseases, other_diseases, index):
     # if index is less than length of first list,
     # get text from data source and return text
     elif index < len(diseases):
-        result = [disease['text'] for disease in data_source if disease['id'] == diseases[index]][0]
+        result = [disease['text'] for disease in data_source if str(disease['id']) in diseases][index]
 
     # if index is less than than total of two list     
     # adapt index to the second list and return the element

@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.38] - 23/05/2022 -
+### Fixed
+  - [nhi] Fix index in pp get encoded diseases
+
 ## [0.0.35] - 15/06/2021 -
 ### Changed
   - [dmshd] : [INFRA-4003] [TELE-1119] add -k to avoid SSL error following the Infra advice about that
