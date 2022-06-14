@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.39] 14/06/2022
+### Changed
+  - [nhi] use iateleservicesCreateDeb pipeline function
+
 ## [0.0.38] - 23/05/2022 -
 ### Fixed
   - [nhi] Fix index in pp get encoded diseases
