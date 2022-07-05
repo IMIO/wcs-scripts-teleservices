@@ -15,9 +15,6 @@ geod = Geod(ellps="WGS84")
 
 def get_coords(context):
     coords = context.get("form_var_carte")
-    if coords:
-        lat, lon = coords.split(";")
-        return {"lat": float(lat), "lon": float(lon)}
     if "form_var_numero" in context:
         geolocate = GeolocateWorkflowStatusItem()
         geolocate.method = "address_string"
@@ -25,6 +22,16 @@ def get_coords(context):
             "{{ form_var_numero}} {{ form_var_voie }}, {{ form_var_commune }}, Belgique"
         )
         return geolocate.geolocate_address_string(None)
+    if "form_var_voie" in context:
+        geolocate = GeolocateWorkflowStatusItem()
+        geolocate.method = "address_string"
+        geolocate.address_string = (
+            "{{ form_var_voie }}, {{ form_var_commune }}, Belgique"
+        )
+        return geolocate.geolocate_address_string(None)
+    if coords:
+        lat, lon = coords.split(";")
+        return {"lat": float(lat), "lon": float(lon)}
     return None
 
 
