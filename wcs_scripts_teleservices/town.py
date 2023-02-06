@@ -5,6 +5,7 @@ import operator
 import re
 from datetime import date, datetime, timedelta
 from decimal import Decimal
+import json
 
 binOps = {
     ast.Add: operator.add,
@@ -298,9 +299,11 @@ class Town(object):
 
     def authentication_delivrance_items_visibility(self, datasource, auth=None):
         if len(auth) > 0:
+            datasource = json.loads(datasource)
             for elm in datasource:
                 if "commune" not in elm["id"]:
                     elm["disabled"] = False
+            return json.dumps(datasource)
         return datasource
 
     def eid_conditional_datasource(self, ds_if_true, ds_if_false):
